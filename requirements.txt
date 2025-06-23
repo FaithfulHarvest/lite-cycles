@@ -1,0 +1,25 @@
+# Core dependencies
+Flask==3.0.2
+python-dotenv==1.0.0
+
+# Development dependencies
+pytest==7.4.3
+black==23.11.0
+flake8==6.1.0
+
+# Data science (optional - uncomment as needed)
+# pandas==2.1.4
+# numpy==1.25.2
+# matplotlib==3.8.2
+# seaborn==0.13.0
+# jupyter==1.0.0
+# ipykernel==6.27.1
+
+# Database (optional - uncomment as needed)
+# sqlalchemy==2.0.23
+# psycopg2-binary==2.9.9
+
+# API (optional - uncomment as needed)
+# requests==2.31.0
+# fastapi==0.104.1
+# uvicorn==0.24.0 
