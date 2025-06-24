@@ -57,6 +57,8 @@ clean-python-template/
 ├── Makefile           # Common project operations
 ├── docker-compose.yml # Container orchestration
 ├── Dockerfile         # Container definition
+├── github_migration.sh # GitHub-based migration toolkit
+├── GITHUB_MIGRATION_GUIDE.md # Migration guide
 └── README.md          # This file
 ```
 
@@ -73,6 +75,7 @@ clean-python-template/
 - **Automation**: Makefile for common operations
 - **Documentation**: Complete setup guide for future reference
 - **AI Assistant Integration**: Seamless command execution and troubleshooting in Cursor
+- **Migration Toolkit**: GitHub-based migration solution for transferring data between Linux machines
 
 ## Dependencies
 
@@ -184,6 +187,43 @@ docker-compose up --build
 # - PostgreSQL: localhost:5432
 # - Redis: localhost:6379
 ```
+
+## Migration Toolkit
+
+This template includes a comprehensive migration toolkit for transferring data between Linux machines using GitHub as a secure transfer medium.
+
+### Quick Migration
+```bash
+# On source machine (laptop)
+./github_migration.sh
+# Choose option 1 - creates backup and pushes to GitHub
+
+# On target machine (desktop)
+./github_migration.sh
+# Choose option 2 - pulls from GitHub and restores
+```
+
+### What Gets Migrated
+- ✅ GitHub repositories (with uncommitted changes)
+- ✅ SSH keys and configurations
+- ✅ Application settings (Postman, browsers, etc.)
+- ✅ System configurations (.bashrc, .profile, etc.)
+- ✅ User documents and data
+- ✅ Cron jobs and scheduled tasks
+- ✅ Package lists and development environments
+
+### Security Features
+- Private GitHub repository with access control
+- Automatic exclusion of sensitive files (SSH keys, passwords, etc.)
+- Secure token-based authentication
+- Version-controlled backup with Git history
+
+### Prerequisites
+- GitHub account with Personal Access Token
+- Git and GitHub CLI installed
+- Network connectivity on both machines
+
+For detailed instructions, see [GITHUB_MIGRATION_GUIDE.md](GITHUB_MIGRATION_GUIDE.md).
 
 ## Environment Variables
 
