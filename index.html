@@ -123,7 +123,7 @@
 
     <script>
         // Game constants
-        const GRID_SIZE = 40;
+        const GRID_SIZE = 60;
         const FPS = 20;
         
         // Colors
@@ -477,34 +477,34 @@
         function drawPlayer(player) {
             if (!player.alive) return;
             
-            // Draw trail with thinner appearance
+            // Draw very thin trail
             for (let i = 0; i < player.trail.length; i++) {
                 const [x, y] = player.trail[i];
-                const alpha = Math.max(0.2, i / player.trail.length);
+                const alpha = Math.max(0.3, i / player.trail.length);
                 
-                // Thin trail with minimal glow
+                // Very thin trail - only 4 pixels wide
                 ctx.fillStyle = player.color;
                 ctx.globalAlpha = alpha;
-                ctx.fillRect(x + 8, y + 8, GRID_SIZE - 16, GRID_SIZE - 16);
+                ctx.fillRect(x + 28, y + 28, 4, 4);
                 
-                // Small bright center
+                // Tiny bright center
                 ctx.fillStyle = WHITE;
-                ctx.globalAlpha = alpha * 0.7;
-                ctx.fillRect(x + 12, y + 12, GRID_SIZE - 24, GRID_SIZE - 24);
+                ctx.globalAlpha = alpha * 0.8;
+                ctx.fillRect(x + 29, y + 29, 2, 2);
             }
             
             ctx.globalAlpha = 1;
             
-            // Draw player head with thinner appearance
-            // Main head
+            // Draw very thin player head
+            // Main head - only 6 pixels wide
             ctx.fillStyle = player.color;
             ctx.globalAlpha = 1;
-            ctx.fillRect(player.x + 6, player.y + 6, GRID_SIZE - 12, GRID_SIZE - 12);
+            ctx.fillRect(player.x + 27, player.y + 27, 6, 6);
             
             // Bright center
             ctx.fillStyle = WHITE;
             ctx.globalAlpha = 1;
-            ctx.fillRect(player.x + 10, player.y + 10, GRID_SIZE - 20, GRID_SIZE - 20);
+            ctx.fillRect(player.x + 28, player.y + 28, 4, 4);
         }
         
         function showGameOver() {
