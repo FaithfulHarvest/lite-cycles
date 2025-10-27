@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# TRON Light Cycles - Web Deployment Script
+# Lite Cycles - Web Deployment Script
 # This script helps deploy the game to GitHub Pages
 
-echo "🎮 TRON Light Cycles - Web Deployment"
-echo "======================================"
+echo "🎮 Lite Cycles - Web Deployment"
+echo "==============================="
 
 # Check if git is initialized
 if [ ! -d ".git" ]; then
     echo "Initializing git repository..."
     git init
     git add .
-    git commit -m "Initial commit: TRON Light Cycles web game"
+    git commit -m "Initial commit: Lite Cycles web game"
 fi
 
 # Check if remote origin exists
@@ -27,7 +27,7 @@ if ! git remote get-url origin >/dev/null 2>&1; then
 else
     echo "Pushing to GitHub..."
     git add .
-    git commit -m "Update TRON Light Cycles web game"
+    git commit -m "Update Lite Cycles web game"
     git push origin main
     echo "✅ Game updated on GitHub Pages!"
 fi
@@ -38,4 +38,4 @@ echo "• Netlify: Drag index.html to netlify.com/drop"
 echo "• Vercel: Connect GitHub repo at vercel.com"
 echo "• Surge.sh: npm install -g surge && surge"
 echo ""
-echo "🎮 Your TRON Light Cycles game is ready to play!"
+echo "🎮 Your Lite Cycles game is ready to play!"

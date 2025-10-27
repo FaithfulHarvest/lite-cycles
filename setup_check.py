@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Installation and Setup Instructions for TRON Light Cycles Game
+Installation and Setup Instructions for Lite Cycles Game
 
 Before running the game, you need to install pygame:
 
@@ -39,7 +39,7 @@ def check_pygame():
 
 def main():
     """Check pygame availability and provide instructions."""
-    print("TRON Light Cycles - Installation Check")
+    print("Lite Cycles - Installation Check")
     print("=" * 40)
     
     if check_pygame():

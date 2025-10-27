@@ -1,12 +1,12 @@
-# TRON Light Cycles - Web Version
+# Lite Cycles - Web Version
 
-A web-based implementation of the classic TRON Light Cycles game, built with HTML5 Canvas and JavaScript.
+A web-based implementation of the classic light cycles game, built with HTML5 Canvas and JavaScript.
 
 ## 🎮 Game Features
 
 - **Two Player Mode**: Player 1 (Arrow Keys) vs Player 2 (WASD)
 - **AI Opponent Mode**: Player 1 (Arrow Keys) vs Smart AI
-- **Neon Tron Aesthetic**: Dark background with bright glowing trails
+- **Neon Aesthetic**: Dark background with bright glowing trails
 - **Fullscreen Support**: Press F to toggle fullscreen mode
 - **Responsive Design**: Works on desktop and mobile devices
 

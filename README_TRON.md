@@ -1,6 +1,6 @@
-# TRON Light Cycles Game
+# Lite Cycles Game
 
-A 2D Tron-style light cycle game built with Python and Pygame.
+A 2D light cycle game built with Python and Pygame.
 
 ## 🎮 Game Description
 
@@ -35,7 +35,7 @@ Two players ride glowing light cycles that leave colored trails behind them. If 
 
 ## 🎯 Game Features
 
-- **Neon Tron Aesthetic**: Dark background with bright glowing trails
+- **Neon Aesthetic**: Dark background with bright glowing trails
 - **Two Game Modes**:
   - Two Player Mode: Player 1 (Arrow Keys) vs Player 2 (WASD)
   - AI Opponent Mode: Player 1 (Arrow Keys) vs AI
@@ -72,7 +72,7 @@ Two players ride glowing light cycles that leave colored trails behind them. If 
 - **Player 1**: Neon blue (#00FFFF)
 - **Player 2**: Neon orange (#FF8000)
 - **Trails**: Glowing with fade effects
-- **UI**: Clean neon aesthetic with "TRON Light Cycles" title
+- **UI**: Clean neon aesthetic with "Lite Cycles" title
 
 ## 🤖 AI Opponent
 

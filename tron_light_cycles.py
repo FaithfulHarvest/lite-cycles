@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TRON Light Cycles Game
-A 2D Tron-style light cycle game using Python and Pygame.
+Lite Cycles Game
+A 2D light cycle game using Python and Pygame.
 
 Two players ride glowing light cycles that leave colored trails behind them.
 If a cycle collides with a trail (including its own) or the wall, that player loses.
@@ -166,7 +166,7 @@ class TronGame:
     def __init__(self):
         self.fullscreen = False
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-        pygame.display.set_caption("TRON Light Cycles - Press F for Fullscreen")
+        pygame.display.set_caption("Lite Cycles - Press F for Fullscreen")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 72)  # Increased for better fullscreen visibility
         self.title_font = pygame.font.Font(None, 144)  # Much larger title for fullscreen
@@ -203,7 +203,7 @@ class TronGame:
             pygame.display.set_caption("TRON Light Cycles - Press F to Exit Fullscreen")
         else:
             self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-            pygame.display.set_caption("TRON Light Cycles - Press F for Fullscreen")
+            pygame.display.set_caption("Lite Cycles - Press F for Fullscreen")
             
     def create_crash_sound(self) -> pygame.mixer.Sound:
         """Create a simple crash sound effect."""
@@ -437,7 +437,7 @@ class TronGame:
         screen_width, screen_height = self.screen.get_size()
         
         # Title
-        title_text = self.title_font.render("TRON LIGHT CYCLES", True, NEON_BLUE)
+        title_text = self.title_font.render("LITE CYCLES", True, NEON_BLUE)
         title_rect = title_text.get_rect(center=(screen_width//2, screen_height//4))
         self.screen.blit(title_text, title_rect)
         
