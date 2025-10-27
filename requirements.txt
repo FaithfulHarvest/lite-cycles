@@ -1,6 +1,7 @@
 # Core dependencies
 Flask==3.0.2
 python-dotenv==1.0.0
+pygame==2.5.2
 
 # Development dependencies
 pytest==7.4.3

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRON Light Cycles</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #00FFFF;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        canvas {
+            border: 2px solid #00FFFF;
+            background: #000;
+            display: block;
+        }
+        
+        .menu {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 48px;
+            color: #00FFFF;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #00FFFF;
+        }
+        
+        .instructions {
+            font-size: 24px;
+            color: #FF8000;
+            margin-bottom: 20px;
+        }
+        
+        .controls {
+            font-size: 18px;
+            color: #FFF;
+            margin-bottom: 10px;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border: 2px solid #00FFFF;
+        }
+        
+        .winner {
+            font-size: 36px;
+            color: #00FFFF;
+            margin-bottom: 20px;
+        }
+        
+        .restart-btn {
+            background: #00FFFF;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .restart-btn:hover {
+            background: #FF8000;
+            color: #000;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #00FFFF;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu" class="menu">
+        <div class="title">TRON LIGHT CYCLES</div>
+        <div class="instructions">Choose Game Mode:</div>
+        <div class="controls">1 - Two Player Mode</div>
+        <div class="controls">Player 1: Arrow Keys | Player 2: WASD</div>
+        <div class="controls">2 - AI Opponent Mode</div>
+        <div class="controls">Player 1: Arrow Keys | AI: Automatic</div>
+        <div class="controls">F - Toggle Fullscreen | ESC - Exit</div>
+    </div>
+    
+    <canvas id="gameCanvas" width="1400" height="900"></canvas>
+    
+    <div id="gameOver" class="game-over hidden">
+        <div id="winnerText" class="winner"></div>
+        <button class="restart-btn" onclick="restartGame()">Play Again</button>
+        <button class="restart-btn" onclick="showMenu()">Main Menu</button>
+    </div>
+    
+    <div id="ui" class="ui hidden">
+        <div id="player1Info">Player 1: Blue</div>
+        <div id="player2Info">Player 2: Orange</div>
+    </div>
+
+    <script>
+        // Game constants
+        const GRID_SIZE = 13;
+        const FPS = 60;
+        
+        // Colors
+        const BLACK = '#000000';
+        const NEON_BLUE = '#00FFFF';
+        const NEON_ORANGE = '#FF8000';
+        const WHITE = '#FFFFFF';
+        const DARK_GRAY = '#141414';
+        
+        // Game states
+        const MENU = 0;
+        const PLAYING = 1;
+        const GAME_OVER = 2;
+        
+        // Game variables
+        let gameState = MENU;
+        let canvas, ctx;
+        let gameWidth, gameHeight;
+        let player1, player2;
+        let aiMode = false;
+        let gameLoop;
+        let lastTime = 0;
+        
+        // Initialize game
+        function init() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            gameWidth = canvas.width;
+            gameHeight = canvas.height;
+            
+            // Event listeners
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+            
+            // Start game loop
+            gameLoop = setInterval(update, 1000 / FPS);
+        }
+        
+        // Player class
+        class Player {
+            constructor(x, y, color, controls, name) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.controls = controls;
+                this.name = name;
+                this.direction = [1, 0]; // Moving right initially
+                this.trail = [[x, y]];
+                this.alive = true;
+                this.speed = GRID_SIZE;
+                this.keysPressed = {};
+            }
+            
+            move() {
+                if (!this.alive) return;
+                
+                this.x += this.direction[0] * this.speed;
+                this.y += this.direction[1] * this.speed;
+                this.trail.push([this.x, this.y]);
+            }
+            
+            changeDirection(newDirection) {
+                if (!this.alive) return;
+                
+                // Prevent 180-degree turns
+                const opposite = [-this.direction[0], -this.direction[1]];
+                if (newDirection[0] !== opposite[0] || newDirection[1] !== opposite[1]) {
+                    this.direction = newDirection;
+                }
+            }
+            
+            checkCollision(otherPlayer) {
+                if (!this.alive) return false;
+                
+                // Check wall collision
+                if (this.x < 0 || this.x >= gameWidth || this.y < 0 || this.y >= gameHeight) {
+                    return true;
+                }
+                
+                // Check collision with own trail (except head)
+                for (let i = 0; i < this.trail.length - 1; i++) {
+                    const [trailX, trailY] = this.trail[i];
+                    if (Math.abs(this.x - trailX) < GRID_SIZE && Math.abs(this.y - trailY) < GRID_SIZE) {
+                        return true;
+                    }
+                }
+                
+                // Check collision with other player's trail
+                for (const [trailX, trailY] of otherPlayer.trail) {
+                    if (Math.abs(this.x - trailX) < GRID_SIZE && Math.abs(this.y - trailY) < GRID_SIZE) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+            
+            crash() {
+                this.alive = false;
+            }
+        }
+        
+        // AI Player class
+        class AIPlayer extends Player {
+            constructor(x, y, color, name) {
+                super(x, y, color, {}, name);
+                this.direction = [-1, 0]; // Moving left initially
+            }
+            
+            makeDecision(otherPlayer) {
+                if (!this.alive) return;
+                
+                const directions = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+                
+                // Remove opposite direction
+                const opposite = [-this.direction[0], -this.direction[1]];
+                const validDirections = directions.filter(dir => 
+                    dir[0] !== opposite[0] || dir[1] !== opposite[1]
+                );
+                
+                // Find safe directions
+                const safeDirections = [];
+                for (const direction of validDirections) {
+                    const testX = this.x + direction[0] * this.speed;
+                    const testY = this.y + direction[1] * this.speed;
+                    
+                    // Check walls
+                    if (testX < 0 || testX >= gameWidth || testY < 0 || testY >= gameHeight) {
+                        continue;
+                    }
+                    
+                    // Check own trail
+                    let safe = true;
+                    for (let i = 0; i < this.trail.length - 1; i++) {
+                        const [trailX, trailY] = this.trail[i];
+                        if (Math.abs(testX - trailX) < GRID_SIZE && Math.abs(testY - trailY) < GRID_SIZE) {
+                            safe = false;
+                            break;
+                        }
+                    }
+                    
+                    // Check opponent trail
+                    if (safe) {
+                        for (const [trailX, trailY] of otherPlayer.trail) {
+                            if (Math.abs(testX - trailX) < GRID_SIZE && Math.abs(testY - trailY) < GRID_SIZE) {
+                                safe = false;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (safe) {
+                        safeDirections.push(direction);
+                    }
+                }
+                
+                // Choose direction
+                if (safeDirections.length > 0) {
+                    if (safeDirections.some(dir => dir[0] === this.direction[0] && dir[1] === this.direction[1])) {
+                        // Keep current direction if safe
+                        return;
+                    } else {
+                        // Pick first safe direction
+                        this.changeDirection(safeDirections[0]);
+                    }
+                } else {
+                    // No safe directions - pick any direction
+                    this.changeDirection(validDirections[0]);
+                }
+            }
+        }
+        
+        // Input handling
+        function handleKeyDown(event) {
+            const key = event.key.toLowerCase();
+            
+            if (gameState === MENU) {
+                if (key === '1') {
+                    startTwoPlayerGame();
+                } else if (key === '2') {
+                    startAIGame();
+                } else if (key === 'f') {
+                    toggleFullscreen();
+                } else if (key === 'escape') {
+                    // Exit game
+                }
+            } else if (gameState === PLAYING) {
+                if (key === 'f') {
+                    toggleFullscreen();
+                } else if (key === 'escape') {
+                    showMenu();
+                } else {
+                    // Movement keys
+                    if (player1 && player1.controls[key]) {
+                        player1.changeDirection(player1.controls[key]);
+                    }
+                    if (player2 && player2.controls[key]) {
+                        player2.changeDirection(player2.controls[key]);
+                    }
+                }
+            } else if (gameState === GAME_OVER) {
+                if (key === 'r') {
+                    restartGame();
+                } else if (key === 'm') {
+                    showMenu();
+                }
+            }
+        }
+        
+        function handleKeyUp(event) {
+            // Handle key releases if needed
+        }
+        
+        // Game functions
+        function startTwoPlayerGame() {
+            aiMode = false;
+            resetGame();
+        }
+        
+        function startAIGame() {
+            aiMode = true;
+            resetGame();
+        }
+        
+        function resetGame() {
+            // Player 1 (blue) starts from left side
+            player1 = new Player(
+                gameWidth / 4,
+                gameHeight / 2,
+                NEON_BLUE,
+                {
+                    'arrowup': [0, -1],
+                    'arrowdown': [0, 1],
+                    'arrowleft': [-1, 0],
+                    'arrowright': [1, 0]
+                },
+                'Player 1'
+            );
+            
+            if (aiMode) {
+                // AI opponent (orange) starts from right side
+                player2 = new AIPlayer(
+                    3 * gameWidth / 4,
+                    gameHeight / 2,
+                    NEON_ORANGE,
+                    'AI'
+                );
+            } else {
+                // Player 2 (orange) starts from right side
+                player2 = new Player(
+                    3 * gameWidth / 4,
+                    gameHeight / 2,
+                    NEON_ORANGE,
+                    {
+                        'w': [0, -1],
+                        's': [0, 1],
+                        'a': [-1, 0],
+                        'd': [1, 0]
+                    },
+                    'Player 2'
+                );
+            }
+            
+            gameState = PLAYING;
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('gameOver').classList.add('hidden');
+            document.getElementById('ui').classList.remove('hidden');
+            
+            updateUI();
+        }
+        
+        function update() {
+            if (gameState !== PLAYING) return;
+            
+            // AI decision making
+            if (aiMode && player2 instanceof AIPlayer) {
+                player2.makeDecision(player1);
+            }
+            
+            // Move players
+            player1.move();
+            player2.move();
+            
+            // Check collisions
+            if (player1.checkCollision(player2)) {
+                player1.crash();
+            }
+            if (player2.checkCollision(player1)) {
+                player2.crash();
+            }
+            
+            // Check for game over
+            if (!player1.alive || !player2.alive) {
+                gameState = GAME_OVER;
+                showGameOver();
+            }
+            
+            draw();
+        }
+        
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = BLACK;
+            ctx.fillRect(0, 0, gameWidth, gameHeight);
+            
+            // Draw grid lines
+            ctx.strokeStyle = DARK_GRAY;
+            ctx.lineWidth = 1;
+            for (let x = 0; x < gameWidth; x += GRID_SIZE * 5) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, gameHeight);
+                ctx.stroke();
+            }
+            for (let y = 0; y < gameHeight; y += GRID_SIZE * 5) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(gameWidth, y);
+                ctx.stroke();
+            }
+            
+            if (gameState === PLAYING) {
+                // Draw players
+                drawPlayer(player1);
+                drawPlayer(player2);
+            }
+        }
+        
+        function drawPlayer(player) {
+            if (!player.alive) return;
+            
+            // Draw trail
+            for (let i = 0; i < player.trail.length; i++) {
+                const [x, y] = player.trail[i];
+                const alpha = i / player.trail.length;
+                
+                ctx.fillStyle = player.color;
+                ctx.globalAlpha = alpha;
+                ctx.fillRect(x, y, GRID_SIZE, GRID_SIZE);
+                
+                // Add glow effect
+                ctx.fillStyle = WHITE;
+                ctx.globalAlpha = alpha * 0.5;
+                ctx.fillRect(x + GRID_SIZE/4, y + GRID_SIZE/4, GRID_SIZE/2, GRID_SIZE/2);
+            }
+            
+            ctx.globalAlpha = 1;
+            
+            // Draw player head
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, GRID_SIZE, GRID_SIZE);
+            
+            // Bright center
+            ctx.fillStyle = WHITE;
+            ctx.fillRect(player.x + 2, player.y + 2, GRID_SIZE - 4, GRID_SIZE - 4);
+        }
+        
+        function showGameOver() {
+            let winner;
+            if (!player1.alive && !player2.alive) {
+                winner = 'TIE GAME!';
+            } else if (!player1.alive) {
+                winner = player2.name + ' WINS!';
+            } else {
+                winner = player1.name + ' WINS!';
+            }
+            
+            document.getElementById('winnerText').textContent = winner;
+            document.getElementById('gameOver').classList.remove('hidden');
+        }
+        
+        function restartGame() {
+            resetGame();
+        }
+        
+        function showMenu() {
+            gameState = MENU;
+            document.getElementById('menu').classList.remove('hidden');
+            document.getElementById('gameOver').classList.add('hidden');
+            document.getElementById('ui').classList.add('hidden');
+        }
+        
+        function updateUI() {
+            document.getElementById('player1Info').textContent = player1.name + ': Blue';
+            document.getElementById('player2Info').textContent = player2.name + ': Orange';
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+        // Start the game
+        init();
+    </script>
+</body>
+</html>
