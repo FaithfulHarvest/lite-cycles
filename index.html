@@ -124,7 +124,8 @@
     <script>
         // Game constants
         const GRID_SIZE = 60;
-        const FPS = 20;
+        const FPS = 15;
+        const BIKE_SPEED = 2; // pixels per frame
         
         // Colors
         const BLACK = '#000000';
@@ -202,8 +203,8 @@
             move() {
                 if (!this.alive) return;
                 
-                this.x += this.direction[0] * GRID_SIZE;
-                this.y += this.direction[1] * GRID_SIZE;
+                this.x += this.direction[0] * BIKE_SPEED;
+                this.y += this.direction[1] * BIKE_SPEED;
                 this.trail.push([this.x, this.y]);
             }
             
@@ -228,14 +229,16 @@
                 // Check collision with own trail (except head)
                 for (let i = 0; i < this.trail.length - 1; i++) {
                     const [trailX, trailY] = this.trail[i];
-                    if (Math.abs(this.x - trailX) < GRID_SIZE && Math.abs(this.y - trailY) < GRID_SIZE) {
+                    const distance = Math.sqrt((this.x - trailX) ** 2 + (this.y - trailY) ** 2);
+                    if (distance < 8) { // collision radius
                         return true;
                     }
                 }
                 
                 // Check collision with other player's trail
                 for (const [trailX, trailY] of otherPlayer.trail) {
-                    if (Math.abs(this.x - trailX) < GRID_SIZE && Math.abs(this.y - trailY) < GRID_SIZE) {
+                    const distance = Math.sqrt((this.x - trailX) ** 2 + (this.y - trailY) ** 2);
+                    if (distance < 8) { // collision radius
                         return true;
                     }
                 }
@@ -269,8 +272,8 @@
                 // Find safe directions
                 const safeDirections = [];
                 for (const direction of validDirections) {
-                    const testX = this.x + direction[0] * GRID_SIZE;
-                    const testY = this.y + direction[1] * GRID_SIZE;
+                    const testX = this.x + direction[0] * BIKE_SPEED * 10; // look ahead
+                    const testY = this.y + direction[1] * BIKE_SPEED * 10;
                     
                     // Check walls
                     if (testX < 0 || testX >= gameWidth || testY < 0 || testY >= gameHeight) {
@@ -281,7 +284,8 @@
                     let safe = true;
                     for (let i = 0; i < this.trail.length - 1; i++) {
                         const [trailX, trailY] = this.trail[i];
-                        if (Math.abs(testX - trailX) < GRID_SIZE && Math.abs(testY - trailY) < GRID_SIZE) {
+                        const distance = Math.sqrt((testX - trailX) ** 2 + (testY - trailY) ** 2);
+                        if (distance < 8) {
                             safe = false;
                             break;
                         }
@@ -290,7 +294,8 @@
                     // Check opponent trail
                     if (safe) {
                         for (const [trailX, trailY] of otherPlayer.trail) {
-                            if (Math.abs(testX - trailX) < GRID_SIZE && Math.abs(testY - trailY) < GRID_SIZE) {
+                            const distance = Math.sqrt((testX - trailX) ** 2 + (testY - trailY) ** 2);
+                            if (distance < 8) {
                                 safe = false;
                                 break;
                             }
