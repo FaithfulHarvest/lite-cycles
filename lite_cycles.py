@@ -56,8 +56,8 @@ class Player:
         if not self.alive:
             return
             
-        # Move multiple grid cells at a time for faster speed
-        move_distance = GRID_SIZE * 2  # Move 2 grid cells per frame
+        # Move at optimal TRON speed - 1.5x grid cells per frame
+        move_distance = GRID_SIZE * 1.5  # Slightly slower than before
         self.x += self.direction[0] * move_distance
         self.y += self.direction[1] * move_distance
         
@@ -132,7 +132,7 @@ class AIPlayer(Player):
         # Find safe directions
         safe_directions = []
         for direction in directions:
-            move_distance = GRID_SIZE * 2  # Match the movement distance
+            move_distance = GRID_SIZE * 1.5  # Match the movement distance
             test_x = self.x + direction[0] * move_distance
             test_y = self.y + direction[1] * move_distance
             
