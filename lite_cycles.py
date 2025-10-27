@@ -20,8 +20,8 @@ pygame.init()
 # Constants
 WINDOW_WIDTH = 1400
 WINDOW_HEIGHT = 900
-GRID_SIZE = 13  # Increased by 10% for faster bike speed
-FPS = 120
+GRID_SIZE = 20  # Proper grid size for TRON-like gameplay
+FPS = 60  # Higher FPS for faster, more responsive gameplay
 
 # Colors (Neon Tron aesthetic)
 BLACK = (0, 0, 0)
@@ -56,11 +56,17 @@ class Player:
         if not self.alive:
             return
             
-        self.x += self.direction[0] * self.speed
-        self.y += self.direction[1] * self.speed
+        # Move multiple grid cells at a time for faster speed
+        move_distance = GRID_SIZE * 2  # Move 2 grid cells per frame
+        self.x += self.direction[0] * move_distance
+        self.y += self.direction[1] * move_distance
         
         # Add current position to trail
         self.trail.append((self.x, self.y))
+        
+        # Limit trail length to prevent memory issues (keep last 1000 positions)
+        if len(self.trail) > 1000:
+            self.trail = self.trail[-1000:]
         
     def change_direction(self, new_direction: Tuple[int, int]) -> None:
         """Change the player's direction (prevents 180-degree turns)."""
@@ -85,11 +91,13 @@ class Player:
         # Check collision with own trail (except the head)
         if len(self.trail) > 1:
             for i, (trail_x, trail_y) in enumerate(self.trail[:-1]):
+                # Check if we're within one grid cell of the trail
                 if abs(self.x - trail_x) < GRID_SIZE and abs(self.y - trail_y) < GRID_SIZE:
                     return True
                     
         # Check collision with other player's trail
         for trail_x, trail_y in other_player.trail:
+            # Check if we're within one grid cell of the trail
             if abs(self.x - trail_x) < GRID_SIZE and abs(self.y - trail_y) < GRID_SIZE:
                 return True
                 
@@ -124,8 +132,9 @@ class AIPlayer(Player):
         # Find safe directions
         safe_directions = []
         for direction in directions:
-            test_x = self.x + direction[0] * self.speed
-            test_y = self.y + direction[1] * self.speed
+            move_distance = GRID_SIZE * 2  # Match the movement distance
+            test_x = self.x + direction[0] * move_distance
+            test_y = self.y + direction[1] * move_distance
             
             # Check walls
             if test_x < 0 or test_x >= screen_width or test_y < 0 or test_y >= screen_height:
@@ -244,10 +253,17 @@ class TronGame:
         # Get current screen dimensions
         screen_width, screen_height = self.screen.get_size()
         
-        # Player 1 (blue) starts from left side
+        # Calculate grid-aligned starting positions
+        grid_cols = screen_width // GRID_SIZE
+        grid_rows = screen_height // GRID_SIZE
+        
+        # Player 1 (blue) starts from left side, grid-aligned
+        player1_x = (grid_cols // 4) * GRID_SIZE
+        player1_y = (grid_rows // 2) * GRID_SIZE
+        
         self.player1 = Player(
-            screen_width // 4, 
-            screen_height // 2, 
+            player1_x, 
+            player1_y, 
             NEON_BLUE,
             {
                 pygame.K_UP: (0, -1),
@@ -259,18 +275,24 @@ class TronGame:
         )
         
         if self.ai_mode:
-            # AI opponent (orange) starts from right side
+            # AI opponent (orange) starts from right side, grid-aligned
+            player2_x = (3 * grid_cols // 4) * GRID_SIZE
+            player2_y = (grid_rows // 2) * GRID_SIZE
+            
             self.player2 = AIPlayer(
-                3 * screen_width // 4,
-                screen_height // 2,
+                player2_x,
+                player2_y,
                 NEON_ORANGE,
                 "AI"
             )
         else:
-            # Player 2 (orange) starts from right side
+            # Player 2 (orange) starts from right side, grid-aligned
+            player2_x = (3 * grid_cols // 4) * GRID_SIZE
+            player2_y = (grid_rows // 2) * GRID_SIZE
+            
             self.player2 = Player(
-                3 * screen_width // 4,
-                screen_height // 2,
+                player2_x,
+                player2_y,
                 NEON_ORANGE,
                 {
                     pygame.K_w: (0, -1),

@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lite Cycles</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Lite Cycles v2.2 - RED TEST VERSION</title>
     <style>
         body {
             margin: 0;
@@ -122,14 +125,14 @@
     </div>
 
     <script>
-        // Game constants
-        const GRID_SIZE = 80;
-        const FPS = 10;
-        const BIKE_SPEED = 1; // pixels per frame
+        // Game constants - FAST VERSION
+        const GRID_SIZE = 20;
+        const FPS = 60;
+        const BIKE_SPEED = GRID_SIZE; // Note: Actual movement is 2x GRID_SIZE in move() function
         
-        // Colors
+        // Colors - TEST VERSION
         const BLACK = '#000000';
-        const NEON_BLUE = '#00FFFF';
+        const NEON_BLUE = '#FF0000'; // CHANGED TO RED FOR TESTING
         const NEON_ORANGE = '#FF4500';
         const WHITE = '#FFFFFF';
         const DARK_GRAY = '#0A0A0A';
@@ -203,9 +206,21 @@
             move() {
                 if (!this.alive) return;
                 
-                this.x += this.direction[0] * BIKE_SPEED;
-                this.y += this.direction[1] * BIKE_SPEED;
+                // Move multiple grid cells at a time for faster speed
+                const moveDistance = GRID_SIZE * 2; // Move 2 grid cells per frame
+                this.x += this.direction[0] * moveDistance;
+                this.y += this.direction[1] * moveDistance;
                 this.trail.push([this.x, this.y]);
+                
+                // Debug: Log speed every 60 frames (once per second)
+                if (Math.random() < 0.016) { // ~1% chance per frame
+                    console.log(`Moving ${moveDistance} pixels per frame at ${FPS} FPS = ${moveDistance * FPS} pixels/second`);
+                }
+                
+                // Limit trail length to prevent memory issues (keep last 1000 positions)
+                if (this.trail.length > 1000) {
+                    this.trail = this.trail.slice(-1000);
+                }
             }
             
             changeDirection(newDirection) {
@@ -226,19 +241,21 @@
                     return true;
                 }
                 
-                // Check collision with own trail (except recent points)
-                for (let i = 0; i < this.trail.length - 20; i++) {
-                    const [trailX, trailY] = this.trail[i];
-                    const distance = Math.sqrt((this.x - trailX) ** 2 + (this.y - trailY) ** 2);
-                    if (distance < 5) {
-                        return true;
+                // Check collision with own trail (except the head)
+                if (this.trail.length > 1) {
+                    for (let i = 0; i < this.trail.length - 1; i++) {
+                        const [trailX, trailY] = this.trail[i];
+                        // Check if we're within one grid cell of the trail
+                        if (Math.abs(this.x - trailX) < GRID_SIZE && Math.abs(this.y - trailY) < GRID_SIZE) {
+                            return true;
+                        }
                     }
                 }
                 
                 // Check collision with other player's trail
                 for (const [trailX, trailY] of otherPlayer.trail) {
-                    const distance = Math.sqrt((this.x - trailX) ** 2 + (this.y - trailY) ** 2);
-                    if (distance < 5) {
+                    // Check if we're within one grid cell of the trail
+                    if (Math.abs(this.x - trailX) < GRID_SIZE && Math.abs(this.y - trailY) < GRID_SIZE) {
                         return true;
                     }
                 }
@@ -272,8 +289,9 @@
                 // Find safe directions
                 const safeDirections = [];
                 for (const direction of validDirections) {
-                    const testX = this.x + direction[0] * BIKE_SPEED * 10; // look ahead
-                    const testY = this.y + direction[1] * BIKE_SPEED * 10;
+                    const moveDistance = GRID_SIZE * 2; // Match the movement distance
+                    const testX = this.x + direction[0] * moveDistance;
+                    const testY = this.y + direction[1] * moveDistance;
                     
                     // Check walls
                     if (testX < 0 || testX >= gameWidth || testY < 0 || testY >= gameHeight) {
@@ -282,10 +300,9 @@
                     
                     // Check own trail
                     let safe = true;
-                    for (let i = 0; i < this.trail.length - 20; i++) {
+                    for (let i = 0; i < this.trail.length - 1; i++) {
                         const [trailX, trailY] = this.trail[i];
-                        const distance = Math.sqrt((testX - trailX) ** 2 + (testY - trailY) ** 2);
-                        if (distance < 5) {
+                        if (Math.abs(testX - trailX) < GRID_SIZE && Math.abs(testY - trailY) < GRID_SIZE) {
                             safe = false;
                             break;
                         }
@@ -294,8 +311,7 @@
                     // Check opponent trail
                     if (safe) {
                         for (const [trailX, trailY] of otherPlayer.trail) {
-                            const distance = Math.sqrt((testX - trailX) ** 2 + (testY - trailY) ** 2);
-                            if (distance < 5) {
+                            if (Math.abs(testX - trailX) < GRID_SIZE && Math.abs(testY - trailY) < GRID_SIZE) {
                                 safe = false;
                                 break;
                             }
@@ -376,10 +392,17 @@
         }
         
         function resetGame() {
-            // Player 1 (blue) starts from left side
+            // Calculate grid-aligned starting positions
+            const gridCols = Math.floor(gameWidth / GRID_SIZE);
+            const gridRows = Math.floor(gameHeight / GRID_SIZE);
+            
+            // Player 1 (blue) starts from left side, grid-aligned
+            const player1X = Math.floor(gridCols / 4) * GRID_SIZE;
+            const player1Y = Math.floor(gridRows / 2) * GRID_SIZE;
+            
             player1 = new Player(
-                gameWidth / 4,
-                gameHeight / 2,
+                player1X,
+                player1Y,
                 NEON_BLUE,
                 {
                     'arrowup': [0, -1],
@@ -391,18 +414,24 @@
             );
             
             if (aiMode) {
-                // Program opponent (orange) starts from right side
+                // Program opponent (orange) starts from right side, grid-aligned
+                const player2X = Math.floor(3 * gridCols / 4) * GRID_SIZE;
+                const player2Y = Math.floor(gridRows / 2) * GRID_SIZE;
+                
                 player2 = new ProgramPlayer(
-                    3 * gameWidth / 4,
-                    gameHeight / 2,
+                    player2X,
+                    player2Y,
                     NEON_ORANGE,
                     'Program'
                 );
             } else {
-                // Player 2 (orange) starts from right side
+                // Player 2 (orange) starts from right side, grid-aligned
+                const player2X = Math.floor(3 * gridCols / 4) * GRID_SIZE;
+                const player2Y = Math.floor(gridRows / 2) * GRID_SIZE;
+                
                 player2 = new Player(
-                    3 * gameWidth / 4,
-                    gameHeight / 2,
+                    player2X,
+                    player2Y,
                     NEON_ORANGE,
                     {
                         'w': [0, -1],
@@ -482,34 +511,24 @@
         function drawPlayer(player) {
             if (!player.alive) return;
             
-            // Draw continuous trail as lines
-            if (player.trail.length > 1) {
-                ctx.strokeStyle = player.color;
-                ctx.lineWidth = 3;
-                ctx.globalAlpha = 0.8;
-                
-                ctx.beginPath();
-                ctx.moveTo(player.trail[0][0] + GRID_SIZE/2, player.trail[0][1] + GRID_SIZE/2);
-                
-                for (let i = 1; i < player.trail.length; i++) {
-                    ctx.lineTo(player.trail[i][0] + GRID_SIZE/2, player.trail[i][1] + GRID_SIZE/2);
-                }
-                ctx.stroke();
+            // Draw trail as grid squares
+            ctx.fillStyle = player.color;
+            ctx.globalAlpha = 0.6;
+            
+            for (let i = 0; i < player.trail.length - 1; i++) {
+                const [trailX, trailY] = player.trail[i];
+                ctx.fillRect(trailX, trailY, GRID_SIZE, GRID_SIZE);
             }
             
             ctx.globalAlpha = 1;
             
-            // Draw player head as a bright dot
+            // Draw player head as a bright square
             ctx.fillStyle = player.color;
-            ctx.beginPath();
-            ctx.arc(player.x + GRID_SIZE/2, player.y + GRID_SIZE/2, 4, 0, 2 * Math.PI);
-            ctx.fill();
+            ctx.fillRect(player.x, player.y, GRID_SIZE, GRID_SIZE);
             
             // Bright center
             ctx.fillStyle = WHITE;
-            ctx.beginPath();
-            ctx.arc(player.x + GRID_SIZE/2, player.y + GRID_SIZE/2, 2, 0, 2 * Math.PI);
-            ctx.fill();
+            ctx.fillRect(player.x + 2, player.y + 2, GRID_SIZE - 4, GRID_SIZE - 4);
         }
         
         function showGameOver() {
@@ -550,7 +569,9 @@
             }
         }
         
-        // Start the game
+        // Start the game - RED TEST VERSION v2.2
+        console.log("Lite Cycles RED TEST VERSION v2.2 loaded - Player 1 should be RED!");
+        console.log("If you see RED instead of blue, changes are going through!");
         init();
     </script>
 </body>
