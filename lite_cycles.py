@@ -200,7 +200,7 @@ class TronGame:
         self.fullscreen = not self.fullscreen
         if self.fullscreen:
             self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-            pygame.display.set_caption("TRON Light Cycles - Press F to Exit Fullscreen")
+            pygame.display.set_caption("Lite Cycles - Press F to Exit Fullscreen")
         else:
             self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
             pygame.display.set_caption("Lite Cycles - Press F for Fullscreen")
@@ -459,7 +459,7 @@ class TronGame:
         
         y_offset = screen_height//3
         for instruction in instructions:
-            if instruction.startswith("TRON") or instruction.startswith("Choose"):
+            if instruction.startswith("LITE") or instruction.startswith("Choose"):
                 color = NEON_BLUE
                 font = self.font
             elif instruction.startswith("1") or instruction.startswith("2"):

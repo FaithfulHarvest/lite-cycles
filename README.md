@@ -1,302 +1,129 @@
-# Clean Python Project Template
+# Lite Cycles Game
 
-A minimal, clean Python project template designed for repeatable setup on fresh Linux systems with Docker support and automation tools.
+A 2D light cycle game built with Python and Pygame.
 
-> **Note:** If you are using this template in Cursor with the AI assistant, the assistant can run commands directly in the background and see the output. This means you do **not** need to copy/paste terminal output back to the assistant for troubleshooting or automation—the assistant will guide you step-by-step and handle errors as they occur.
+## 🎮 Game Description
 
-## Quick Start
+Two players ride glowing light cycles that leave colored trails behind them. If a cycle collides with a trail (including its own) or the wall, that player loses. The last player remaining wins the round.
 
-### Option 1: Automated Setup (Recommended)
-```bash
-# Clone this template
-git clone <your-template-repo-url>
-cd clean-python-template
+## 🚀 Quick Start
 
-# Create a new project
-./setup_project.sh my-new-project
-cd my-new-project
-
-# Run the application
-make run
-```
-
-### Option 2: Manual Setup
-1. **Clone this template:**
+1. **Install pygame** (choose one method):
    ```bash
-   git clone <your-template-repo-url>
-   cd clean-python-template
+   # Option 1: Virtual environment (recommended)
+   python3 -m venv game_env
+   source game_env/bin/activate
+   pip install pygame==2.5.2
+   
+   # Option 2: System package manager
+   sudo apt install python3-pygame
+   
+   # Option 3: Using pipx
+   sudo apt install pipx
+   pipx install pygame
    ```
 
-2. **Set up virtual environment:**
+2. **Run the game**:
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate
+   python3 lite_cycles.py
    ```
 
-3. **Install dependencies:**
+3. **Check installation** (optional):
    ```bash
-   pip install -r requirements.txt
+   python3 setup_check.py
    ```
 
-4. **Run the application:**
-   ```bash
-   python main.py
-   ```
+## 🎯 Game Features
 
-## Project Structure
+- **Neon Aesthetic**: Dark background with bright glowing trails
+- **Two Game Modes**:
+  - Two Player Mode: Player 1 (Arrow Keys) vs Player 2 (WASD)
+  - AI Opponent Mode: Player 1 (Arrow Keys) vs AI
+- **Grid-based Movement**: Each frame moves the cycle one unit forward
+- **Collision Detection**: Crash on walls or any trail
+- **Visual Effects**: Glowing trails with fade effects
+- **Sound Effects**: Crash sounds and background hum
+- **Game States**: Menu, Playing, Game Over with restart options
 
-```
-clean-python-template/
-├── .gitignore          # Comprehensive Python gitignore
-├── requirements.txt    # Python dependencies
-├── main.py            # Main application entry point
-├── app.log            # Application log file
-├── analysis.ipynb     # Jupyter notebook template
-├── setup_guide.md     # Detailed setup instructions
-├── setup_project.sh   # Automated project creation script
-├── Makefile           # Common project operations
-├── docker-compose.yml # Container orchestration
-├── Dockerfile         # Container definition
-├── github_migration.sh # GitHub-based migration toolkit
-├── GITHUB_MIGRATION_GUIDE.md # Migration guide
-└── README.md          # This file
-```
+## 🎮 Controls
 
-## Features
+### Player 1 (Blue Cycle)
+- ↑ Arrow: Move Up
+- ↓ Arrow: Move Down  
+- ← Arrow: Move Left
+- → Arrow: Move Right
 
-- **Minimal and Clean**: No unnecessary files or complexity
-- **Repeatable Setup**: Works consistently on fresh Linux systems
-- **Virtual Environment**: Proper Python isolation
-- **Comprehensive .gitignore**: Covers all common Python artifacts
-- **Logging**: Built-in logging configuration
-- **Environment Variables**: Support for .env files
-- **Jupyter Ready**: Includes comprehensive notebook template for data analysis
-- **Docker Support**: Full containerization with docker-compose
-- **Automation**: Makefile for common operations
-- **Documentation**: Complete setup guide for future reference
-- **AI Assistant Integration**: Seamless command execution and troubleshooting in Cursor
-- **Migration Toolkit**: GitHub-based migration solution for transferring data between Linux machines
+### Player 2 (Orange Cycle)
+- W: Move Up
+- S: Move Down
+- A: Move Left
+- D: Move Right
 
-## Dependencies
+### Game Controls
+- **1**: Two Player Mode
+- **2**: AI Opponent Mode
+- **R**: Restart Game (after game over)
+- **M**: Main Menu (after game over)
+- **ESC**: Exit Game
 
-### Core Dependencies
-- Flask 3.0.2 - Web framework
-- python-dotenv 1.0.0 - Environment variable management
+## 🎨 Visual Style
 
-### Development Dependencies
-- pytest 7.4.3 - Testing framework
-- black 23.11.0 - Code formatting
-- flake8 6.1.0 - Linting
+- **Background**: Deep black with subtle grid lines
+- **Player 1**: Neon blue (#00FFFF)
+- **Player 2**: Neon orange (#FF8000)
+- **Trails**: Glowing with fade effects
+- **UI**: Clean neon aesthetic with "Lite Cycles" title
 
-### Optional Dependencies (commented in requirements.txt)
-- Data science: pandas, numpy, matplotlib, seaborn, jupyter
-- Database: sqlalchemy, psycopg2-binary
-- API: requests, fastapi, uvicorn
+## 🤖 AI Opponent
 
-## Usage
+The AI opponent uses a simple strategy:
+- Avoids walls and trails
+- Prefers current direction if safe
+- Makes random decisions when multiple safe options exist
+- Calculates distances to walls for optimal positioning
 
-### Basic Application
-```bash
-python main.py
-# or
-make run
+## 🔧 Customization
+
+The game is easily modifiable. Key constants in `lite_cycles.py`:
+
+```python
+WINDOW_WIDTH = 1000      # Game window width
+WINDOW_HEIGHT = 700      # Game window height
+GRID_SIZE = 10           # Size of grid cells
+FPS = 60                 # Frames per second
+NEON_BLUE = (0, 255, 255)    # Player 1 color
+NEON_ORANGE = (255, 128, 0)  # Player 2 color
 ```
 
-### Jupyter Notebook
-```bash
-jupyter notebook analysis.ipynb
-# or
-make jupyter
-```
+## 🎵 Sound Effects
 
-### Testing
-```bash
-pytest
-# or
-make test
-```
+- **Crash Sound**: Generated noise burst when players crash
+- **Background Hum**: Low-frequency sine wave for atmosphere
+- Sound effects are optional and will work without audio if pygame sound fails
 
-### Code Formatting
-```bash
-black .
-# or
-make format
-```
+## 🏆 Game Rules
 
-### Linting
-```bash
-flake8 .
-# or
-make lint
-```
+1. Players start on opposite sides of the screen
+2. Light cycles move continuously in their current direction
+3. Players can change direction (but not reverse 180°)
+4. Collision with any trail or wall results in crash
+5. Last player standing wins the round
+6. Game supports ties when both players crash simultaneously
 
-### Docker Environment
-```bash
-# Start all services
-docker-compose up
+## 🐛 Troubleshooting
 
-# Start specific service
-docker-compose up app
-docker-compose up jupyter
+If you encounter issues:
 
-# Run in background
-docker-compose up -d
+1. **Pygame not found**: Run `python3 setup_check.py` for installation help
+2. **Sound issues**: Game will work without sound effects
+3. **Performance issues**: Reduce FPS or increase GRID_SIZE
+4. **Display issues**: Check your pygame installation
 
-# Stop services
-docker-compose down
-```
+## 📁 Files
 
-## Makefile Commands
+- `lite_cycles.py`: Main game file
+- `setup_check.py`: Installation verification script
+- `requirements.txt`: Python dependencies
+- `README.md`: This documentation
 
-The included Makefile provides convenient shortcuts for common operations:
-
-```bash
-make help          # Show all available commands
-make setup         # Full project setup (venv + install)
-make install       # Install dependencies
-make run           # Run the application
-make test          # Run tests
-make format        # Format code with black
-make lint          # Lint code with flake8
-make clean         # Clean up generated files
-make jupyter       # Start Jupyter notebook
-make install-ds    # Install data science packages
-make install-db    # Install database packages
-make install-api   # Install API packages
-make install-all   # Install all optional packages
-make info          # Show project information
-```
-
-## Docker Services
-
-The `docker-compose.yml` includes several services:
-
-- **app**: Main Python application (ports 5000, 8000)
-- **jupyter**: Jupyter notebook server (port 8888)
-- **postgres**: PostgreSQL database (port 5432)
-- **redis**: Redis cache (port 6379)
-
-### Docker Quick Start
-```bash
-# Build and start all services
-docker-compose up --build
-
-# Access services
-# - App: http://localhost:5000
-# - Jupyter: http://localhost:8888
-# - PostgreSQL: localhost:5432
-# - Redis: localhost:6379
-```
-
-## Migration Toolkit
-
-This template includes a comprehensive migration toolkit for transferring data between Linux machines using GitHub as a secure transfer medium.
-
-### Quick Migration
-```bash
-# On source machine (laptop)
-./github_migration.sh
-# Choose option 1 - creates backup and pushes to GitHub
-
-# On target machine (desktop)
-./github_migration.sh
-# Choose option 2 - pulls from GitHub and restores
-```
-
-### What Gets Migrated
-- ✅ GitHub repositories (with uncommitted changes)
-- ✅ SSH keys and configurations
-- ✅ Application settings (Postman, browsers, etc.)
-- ✅ System configurations (.bashrc, .profile, etc.)
-- ✅ User documents and data
-- ✅ Cron jobs and scheduled tasks
-- ✅ Package lists and development environments
-
-### Security Features
-- Private GitHub repository with access control
-- Automatic exclusion of sensitive files (SSH keys, passwords, etc.)
-- Secure token-based authentication
-- Version-controlled backup with Git history
-
-### Prerequisites
-- GitHub account with Personal Access Token
-- Git and GitHub CLI installed
-- Network connectivity on both machines
-
-For detailed instructions, see [GITHUB_MIGRATION_GUIDE.md](GITHUB_MIGRATION_GUIDE.md).
-
-## Environment Variables
-
-Create a `.env` file in the project root:
-
-```bash
-APP_NAME=My Application
-DEBUG=True
-DATABASE_URL=sqlite:///app.db
-SECRET_KEY=your-secret-key-here
-POSTGRES_DB=pythonapp
-POSTGRES_USER=pythonuser
-POSTGRES_PASSWORD=pythonpass
-REDIS_URL=redis://localhost:6379
-```
-
-## Jupyter Notebook Template
-
-The `analysis.ipynb` includes:
-- Standard data science imports (pandas, numpy, matplotlib, seaborn)
-- Plotting configuration
-- Sample data generation
-- Data exploration examples
-- Visualization templates
-- Analysis workflow structure
-
-## Customization
-
-1. **Modify requirements.txt** - Add/remove packages as needed
-2. **Update main.py** - Replace with your application logic
-3. **Customize analysis.ipynb** - Adapt for your data analysis needs
-4. **Extend setup_guide.md** - Add project-specific instructions
-5. **Modify docker-compose.yml** - Add/remove services as needed
-6. **Update Makefile** - Add custom commands for your workflow
-
-## Best Practices
-
-- Always use virtual environments
-- Pin dependency versions
-- Use environment variables for configuration
-- Write tests for your code
-- Use linting and formatting tools
-- Document your setup process
-- Use Docker for consistent environments
-- Leverage the Makefile for automation
-- Use the AI assistant in Cursor for seamless setup and troubleshooting
-
-## Troubleshooting
-
-See `setup_guide.md` for detailed troubleshooting information and common issues.
-
-> **Note:** When using Cursor, the AI assistant can run commands in the background and see the output directly. You do **not** need to copy/paste terminal output for troubleshooting—the assistant will handle errors and guide you interactively.
-
-### Common Docker Issues
-```bash
-# If containers won't start
-docker-compose down -v
-docker-compose up --build
-
-# If ports are already in use
-docker-compose down
-# Change ports in docker-compose.yml
-docker-compose up
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test on a fresh system
-5. Submit a pull request
-
-## License
-
-This template is provided as-is for educational and development purposes. 
+Enjoy the game! 🎮
