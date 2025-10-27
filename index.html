@@ -101,8 +101,8 @@
         <div class="instructions">Choose Game Mode:</div>
         <div class="controls">1 - Two Player Mode</div>
         <div class="controls">Player 1: Arrow Keys | Player 2: WASD</div>
-        <div class="controls">2 - AI Opponent Mode</div>
-        <div class="controls">Player 1: Arrow Keys | AI: Automatic</div>
+        <div class="controls">2 - Program Opponent Mode</div>
+        <div class="controls">Player 1: Arrow Keys | Program: Automatic</div>
         <div class="controls">F - Toggle Fullscreen | ESC - Exit</div>
         <div class="controls">R - Restart Game | M - Main Menu</div>
     </div>
@@ -123,15 +123,15 @@
 
     <script>
         // Game constants
-        const GRID_SIZE = 20;
+        const GRID_SIZE = 30;
         const FPS = 30;
         
         // Colors
         const BLACK = '#000000';
         const NEON_BLUE = '#00FFFF';
-        const NEON_ORANGE = '#FF8000';
+        const NEON_ORANGE = '#FF4500';
         const WHITE = '#FFFFFF';
-        const DARK_GRAY = '#141414';
+        const DARK_GRAY = '#0A0A0A';
         
         // Game states
         const MENU = 0;
@@ -248,8 +248,8 @@
             }
         }
         
-        // AI Player class
-        class AIPlayer extends Player {
+        // Program Player class
+        class ProgramPlayer extends Player {
             constructor(x, y, color, name) {
                 super(x, y, color, {}, name);
                 this.direction = [-1, 0]; // Moving left initially
@@ -386,12 +386,12 @@
             );
             
             if (aiMode) {
-                // AI opponent (orange) starts from right side
-                player2 = new AIPlayer(
+                // Program opponent (orange) starts from right side
+                player2 = new ProgramPlayer(
                     3 * gameWidth / 4,
                     gameHeight / 2,
                     NEON_ORANGE,
-                    'AI'
+                    'Program'
                 );
             } else {
                 // Player 2 (orange) starts from right side
@@ -420,8 +420,8 @@
         function update() {
             if (gameState !== PLAYING) return;
             
-            // AI decision making
-            if (aiMode && player2 instanceof AIPlayer) {
+            // Program decision making
+            if (aiMode && player2 instanceof ProgramPlayer) {
                 player2.makeDecision(player1);
             }
             
@@ -477,30 +477,44 @@
         function drawPlayer(player) {
             if (!player.alive) return;
             
-            // Draw trail
+            // Draw trail with enhanced glow
             for (let i = 0; i < player.trail.length; i++) {
                 const [x, y] = player.trail[i];
-                const alpha = i / player.trail.length;
+                const alpha = Math.max(0.3, i / player.trail.length);
                 
+                // Outer glow
+                ctx.fillStyle = player.color;
+                ctx.globalAlpha = alpha * 0.8;
+                ctx.fillRect(x - 2, y - 2, GRID_SIZE + 4, GRID_SIZE + 4);
+                
+                // Main trail
                 ctx.fillStyle = player.color;
                 ctx.globalAlpha = alpha;
                 ctx.fillRect(x, y, GRID_SIZE, GRID_SIZE);
                 
-                // Add glow effect
+                // Bright center
                 ctx.fillStyle = WHITE;
-                ctx.globalAlpha = alpha * 0.5;
-                ctx.fillRect(x + GRID_SIZE/4, y + GRID_SIZE/4, GRID_SIZE/2, GRID_SIZE/2);
+                ctx.globalAlpha = alpha * 0.9;
+                ctx.fillRect(x + 3, y + 3, GRID_SIZE - 6, GRID_SIZE - 6);
             }
             
             ctx.globalAlpha = 1;
             
-            // Draw player head
+            // Draw player head with enhanced glow
+            // Outer glow
             ctx.fillStyle = player.color;
+            ctx.globalAlpha = 0.6;
+            ctx.fillRect(player.x - 3, player.y - 3, GRID_SIZE + 6, GRID_SIZE + 6);
+            
+            // Main head
+            ctx.fillStyle = player.color;
+            ctx.globalAlpha = 1;
             ctx.fillRect(player.x, player.y, GRID_SIZE, GRID_SIZE);
             
             // Bright center
             ctx.fillStyle = WHITE;
-            ctx.fillRect(player.x + 2, player.y + 2, GRID_SIZE - 4, GRID_SIZE - 4);
+            ctx.globalAlpha = 1;
+            ctx.fillRect(player.x + 4, player.y + 4, GRID_SIZE - 8, GRID_SIZE - 8);
         }
         
         function showGameOver() {
