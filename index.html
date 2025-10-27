@@ -123,9 +123,9 @@
 
     <script>
         // Game constants
-        const GRID_SIZE = 60;
-        const FPS = 15;
-        const BIKE_SPEED = 2; // pixels per frame
+        const GRID_SIZE = 80;
+        const FPS = 10;
+        const BIKE_SPEED = 1; // pixels per frame
         
         // Colors
         const BLACK = '#000000';
@@ -227,10 +227,10 @@
                 }
                 
                 // Check collision with own trail (except head)
-                for (let i = 0; i < this.trail.length - 1; i++) {
+                for (let i = 0; i < this.trail.length - 5; i++) { // skip recent trail points
                     const [trailX, trailY] = this.trail[i];
                     const distance = Math.sqrt((this.x - trailX) ** 2 + (this.y - trailY) ** 2);
-                    if (distance < 8) { // collision radius
+                    if (distance < 6) { // collision radius
                         return true;
                     }
                 }
@@ -238,7 +238,7 @@
                 // Check collision with other player's trail
                 for (const [trailX, trailY] of otherPlayer.trail) {
                     const distance = Math.sqrt((this.x - trailX) ** 2 + (this.y - trailY) ** 2);
-                    if (distance < 8) { // collision radius
+                    if (distance < 6) { // collision radius
                         return true;
                     }
                 }
@@ -482,34 +482,34 @@
         function drawPlayer(player) {
             if (!player.alive) return;
             
-            // Draw very thin trail
-            for (let i = 0; i < player.trail.length; i++) {
-                const [x, y] = player.trail[i];
-                const alpha = Math.max(0.3, i / player.trail.length);
+            // Draw continuous trail as lines
+            if (player.trail.length > 1) {
+                ctx.strokeStyle = player.color;
+                ctx.lineWidth = 3;
+                ctx.globalAlpha = 0.8;
                 
-                // Very thin trail - only 4 pixels wide
-                ctx.fillStyle = player.color;
-                ctx.globalAlpha = alpha;
-                ctx.fillRect(x + 28, y + 28, 4, 4);
+                ctx.beginPath();
+                ctx.moveTo(player.trail[0][0] + GRID_SIZE/2, player.trail[0][1] + GRID_SIZE/2);
                 
-                // Tiny bright center
-                ctx.fillStyle = WHITE;
-                ctx.globalAlpha = alpha * 0.8;
-                ctx.fillRect(x + 29, y + 29, 2, 2);
+                for (let i = 1; i < player.trail.length; i++) {
+                    ctx.lineTo(player.trail[i][0] + GRID_SIZE/2, player.trail[i][1] + GRID_SIZE/2);
+                }
+                ctx.stroke();
             }
             
             ctx.globalAlpha = 1;
             
-            // Draw very thin player head
-            // Main head - only 6 pixels wide
+            // Draw player head as a bright dot
             ctx.fillStyle = player.color;
-            ctx.globalAlpha = 1;
-            ctx.fillRect(player.x + 27, player.y + 27, 6, 6);
+            ctx.beginPath();
+            ctx.arc(player.x + GRID_SIZE/2, player.y + GRID_SIZE/2, 4, 0, 2 * Math.PI);
+            ctx.fill();
             
             // Bright center
             ctx.fillStyle = WHITE;
-            ctx.globalAlpha = 1;
-            ctx.fillRect(player.x + 28, player.y + 28, 4, 4);
+            ctx.beginPath();
+            ctx.arc(player.x + GRID_SIZE/2, player.y + GRID_SIZE/2, 2, 0, 2 * Math.PI);
+            ctx.fill();
         }
         
         function showGameOver() {
