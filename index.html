@@ -227,10 +227,10 @@
                 }
                 
                 // Check collision with own trail (except recent points)
-                for (let i = 0; i < this.trail.length - 10; i++) {
+                for (let i = 0; i < this.trail.length - 20; i++) {
                     const [trailX, trailY] = this.trail[i];
                     const distance = Math.sqrt((this.x - trailX) ** 2 + (this.y - trailY) ** 2);
-                    if (distance < 8) {
+                    if (distance < 5) {
                         return true;
                     }
                 }
@@ -238,7 +238,7 @@
                 // Check collision with other player's trail
                 for (const [trailX, trailY] of otherPlayer.trail) {
                     const distance = Math.sqrt((this.x - trailX) ** 2 + (this.y - trailY) ** 2);
-                    if (distance < 8) {
+                    if (distance < 5) {
                         return true;
                     }
                 }
@@ -282,10 +282,10 @@
                     
                     // Check own trail
                     let safe = true;
-                    for (let i = 0; i < this.trail.length - 10; i++) {
+                    for (let i = 0; i < this.trail.length - 20; i++) {
                         const [trailX, trailY] = this.trail[i];
                         const distance = Math.sqrt((testX - trailX) ** 2 + (testY - trailY) ** 2);
-                        if (distance < 8) {
+                        if (distance < 5) {
                             safe = false;
                             break;
                         }
@@ -295,7 +295,7 @@
                     if (safe) {
                         for (const [trailX, trailY] of otherPlayer.trail) {
                             const distance = Math.sqrt((testX - trailX) ** 2 + (testY - trailY) ** 2);
-                            if (distance < 8) {
+                            if (distance < 5) {
                                 safe = false;
                                 break;
                             }
