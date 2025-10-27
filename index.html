@@ -104,12 +104,14 @@
         <div class="controls">2 - AI Opponent Mode</div>
         <div class="controls">Player 1: Arrow Keys | AI: Automatic</div>
         <div class="controls">F - Toggle Fullscreen | ESC - Exit</div>
+        <div class="controls">R - Restart Game | M - Main Menu</div>
     </div>
     
-    <canvas id="gameCanvas" width="1400" height="900"></canvas>
+    <canvas id="gameCanvas"></canvas>
     
-    <div id="gameOver" class="game-over hidden">
+        <div id="gameOver" class="game-over hidden">
         <div id="winnerText" class="winner"></div>
+        <div class="controls">R - Play Again | M - Main Menu</div>
         <button class="restart-btn" onclick="restartGame()">Play Again</button>
         <button class="restart-btn" onclick="showMenu()">Main Menu</button>
     </div>
@@ -121,8 +123,8 @@
 
     <script>
         // Game constants
-        const GRID_SIZE = 13;
-        const FPS = 60;
+        const GRID_SIZE = 20;
+        const FPS = 30;
         
         // Colors
         const BLACK = '#000000';
@@ -149,8 +151,10 @@
         function init() {
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
-            gameWidth = canvas.width;
-            gameHeight = canvas.height;
+            
+            // Set canvas size to fit screen
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
             
             // Event listeners
             document.addEventListener('keydown', handleKeyDown);
@@ -158,6 +162,26 @@
             
             // Start game loop
             gameLoop = setInterval(update, 1000 / FPS);
+        }
+        
+        // Resize canvas to fit screen
+        function resizeCanvas() {
+            const maxWidth = window.innerWidth - 40;
+            const maxHeight = window.innerHeight - 200;
+            
+            // Calculate grid dimensions
+            const gridCols = Math.floor(maxWidth / GRID_SIZE);
+            const gridRows = Math.floor(maxHeight / GRID_SIZE);
+            
+            // Set canvas size to fit grid
+            gameWidth = gridCols * GRID_SIZE;
+            gameHeight = gridRows * GRID_SIZE;
+            
+            canvas.width = gameWidth;
+            canvas.height = gameHeight;
+            
+            // Center canvas
+            canvas.style.margin = '20px auto';
         }
         
         // Player class
@@ -178,8 +202,8 @@
             move() {
                 if (!this.alive) return;
                 
-                this.x += this.direction[0] * this.speed;
-                this.y += this.direction[1] * this.speed;
+                this.x += this.direction[0] * GRID_SIZE;
+                this.y += this.direction[1] * GRID_SIZE;
                 this.trail.push([this.x, this.y]);
             }
             
@@ -245,8 +269,8 @@
                 // Find safe directions
                 const safeDirections = [];
                 for (const direction of validDirections) {
-                    const testX = this.x + direction[0] * this.speed;
-                    const testY = this.y + direction[1] * this.speed;
+                    const testX = this.x + direction[0] * GRID_SIZE;
+                    const testY = this.y + direction[1] * GRID_SIZE;
                     
                     // Check walls
                     if (testX < 0 || testX >= gameWidth || testY < 0 || testY >= gameHeight) {
