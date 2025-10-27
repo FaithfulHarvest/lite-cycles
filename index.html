@@ -123,8 +123,8 @@
 
     <script>
         // Game constants
-        const GRID_SIZE = 30;
-        const FPS = 30;
+        const GRID_SIZE = 40;
+        const FPS = 20;
         
         // Colors
         const BLACK = '#000000';
@@ -477,44 +477,34 @@
         function drawPlayer(player) {
             if (!player.alive) return;
             
-            // Draw trail with enhanced glow
+            // Draw trail with thinner appearance
             for (let i = 0; i < player.trail.length; i++) {
                 const [x, y] = player.trail[i];
-                const alpha = Math.max(0.3, i / player.trail.length);
+                const alpha = Math.max(0.2, i / player.trail.length);
                 
-                // Outer glow
-                ctx.fillStyle = player.color;
-                ctx.globalAlpha = alpha * 0.8;
-                ctx.fillRect(x - 2, y - 2, GRID_SIZE + 4, GRID_SIZE + 4);
-                
-                // Main trail
+                // Thin trail with minimal glow
                 ctx.fillStyle = player.color;
                 ctx.globalAlpha = alpha;
-                ctx.fillRect(x, y, GRID_SIZE, GRID_SIZE);
+                ctx.fillRect(x + 8, y + 8, GRID_SIZE - 16, GRID_SIZE - 16);
                 
-                // Bright center
+                // Small bright center
                 ctx.fillStyle = WHITE;
-                ctx.globalAlpha = alpha * 0.9;
-                ctx.fillRect(x + 3, y + 3, GRID_SIZE - 6, GRID_SIZE - 6);
+                ctx.globalAlpha = alpha * 0.7;
+                ctx.fillRect(x + 12, y + 12, GRID_SIZE - 24, GRID_SIZE - 24);
             }
             
             ctx.globalAlpha = 1;
             
-            // Draw player head with enhanced glow
-            // Outer glow
-            ctx.fillStyle = player.color;
-            ctx.globalAlpha = 0.6;
-            ctx.fillRect(player.x - 3, player.y - 3, GRID_SIZE + 6, GRID_SIZE + 6);
-            
+            // Draw player head with thinner appearance
             // Main head
             ctx.fillStyle = player.color;
             ctx.globalAlpha = 1;
-            ctx.fillRect(player.x, player.y, GRID_SIZE, GRID_SIZE);
+            ctx.fillRect(player.x + 6, player.y + 6, GRID_SIZE - 12, GRID_SIZE - 12);
             
             // Bright center
             ctx.fillStyle = WHITE;
             ctx.globalAlpha = 1;
-            ctx.fillRect(player.x + 4, player.y + 4, GRID_SIZE - 8, GRID_SIZE - 8);
+            ctx.fillRect(player.x + 10, player.y + 10, GRID_SIZE - 20, GRID_SIZE - 20);
         }
         
         function showGameOver() {
