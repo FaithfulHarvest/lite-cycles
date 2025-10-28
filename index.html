@@ -129,10 +129,10 @@
     </div>
 
     <script>
-        // Game constants - SLOWER, MORE PLAYABLE VERSION
+        // Game constants - MUCH SLOWER, STRATEGIC VERSION
         const GRID_SIZE = 20;
         const FPS = 60;
-        const BIKE_SPEED = GRID_SIZE; // Note: Actual movement is 1.0x GRID_SIZE in move() function
+        const BIKE_SPEED = GRID_SIZE; // Note: Actual movement is 0.5x GRID_SIZE in move() function
         
         // Colors - TRON STYLE
         const BLACK = '#000000';
@@ -210,8 +210,8 @@
             move() {
                 if (!this.alive) return;
                 
-                // Move at proper TRON speed - 1.0x grid cells per frame (slower, more playable)
-                const moveDistance = GRID_SIZE * 1.0;
+                // Move at proper TRON speed - 0.5x grid cells per frame (much slower, strategic)
+                const moveDistance = GRID_SIZE * 0.5;
                 this.x += this.direction[0] * moveDistance;
                 this.y += this.direction[1] * moveDistance;
                 this.trail.push([this.x, this.y]);
@@ -288,7 +288,7 @@
                 // Find safe directions
                 const safeDirections = [];
                 for (const direction of validDirections) {
-                    const moveDistance = GRID_SIZE * 1.0; // Match the movement distance
+                    const moveDistance = GRID_SIZE * 0.5; // Match the movement distance
                     const testX = this.x + direction[0] * moveDistance;
                     const testY = this.y + direction[1] * moveDistance;
                     
@@ -595,8 +595,8 @@
             }
         }
         
-        // Start the game - TRON STYLE v2.5
-        console.log("Lite Cycles TRON STYLE v2.5 loaded - Slower speed, proper glow effects, and enhanced styling!");
+        // Start the game - TRON STYLE v2.6
+        console.log("Lite Cycles TRON STYLE v2.6 loaded - Much slower speed, strategic gameplay, and enhanced styling!");
         init();
     </script>
 </body>
