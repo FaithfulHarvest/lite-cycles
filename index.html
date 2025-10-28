@@ -240,12 +240,12 @@
                     return true;
                 }
                 
-                // Check collision with own trail (except the head)
-                if (this.trail.length > 1) {
-                    for (let i = 0; i < this.trail.length - 1; i++) {
+                // Check collision with own trail (except the head and very recent positions)
+                if (this.trail.length > 3) {
+                    for (let i = 0; i < this.trail.length - 3; i++) {
                         const [trailX, trailY] = this.trail[i];
-                        // Check if we're within one grid cell of the trail
-                        if (Math.abs(this.x - trailX) < GRID_SIZE && Math.abs(this.y - trailY) < GRID_SIZE) {
+                        // Check if we're within half a grid cell of the trail (more precise)
+                        if (Math.abs(this.x - trailX) < GRID_SIZE/2 && Math.abs(this.y - trailY) < GRID_SIZE/2) {
                             return true;
                         }
                     }
@@ -253,8 +253,8 @@
                 
                 // Check collision with other player's trail
                 for (const [trailX, trailY] of otherPlayer.trail) {
-                    // Check if we're within one grid cell of the trail
-                    if (Math.abs(this.x - trailX) < GRID_SIZE && Math.abs(this.y - trailY) < GRID_SIZE) {
+                    // Check if we're within half a grid cell of the trail (more precise)
+                    if (Math.abs(this.x - trailX) < GRID_SIZE/2 && Math.abs(this.y - trailY) < GRID_SIZE/2) {
                         return true;
                     }
                 }
@@ -299,9 +299,9 @@
                     
                     // Check own trail
                     let safe = true;
-                    for (let i = 0; i < this.trail.length - 1; i++) {
+                    for (let i = 0; i < this.trail.length - 3; i++) {
                         const [trailX, trailY] = this.trail[i];
-                        if (Math.abs(testX - trailX) < GRID_SIZE && Math.abs(testY - trailY) < GRID_SIZE) {
+                        if (Math.abs(testX - trailX) < GRID_SIZE/2 && Math.abs(testY - trailY) < GRID_SIZE/2) {
                             safe = false;
                             break;
                         }
@@ -310,7 +310,7 @@
                     // Check opponent trail
                     if (safe) {
                         for (const [trailX, trailY] of otherPlayer.trail) {
-                            if (Math.abs(testX - trailX) < GRID_SIZE && Math.abs(testY - trailY) < GRID_SIZE) {
+                            if (Math.abs(testX - trailX) < GRID_SIZE/2 && Math.abs(testY - trailY) < GRID_SIZE/2) {
                                 safe = false;
                                 break;
                             }
@@ -396,7 +396,7 @@
             const gridRows = Math.floor(gameHeight / GRID_SIZE);
             
             // Player 1 (blue) starts from left side, grid-aligned
-            const player1X = Math.floor(gridCols / 4) * GRID_SIZE;
+            const player1X = Math.floor(gridCols / 6) * GRID_SIZE;
             const player1Y = Math.floor(gridRows / 2) * GRID_SIZE;
             
             player1 = new Player(
@@ -414,7 +414,7 @@
             
             if (aiMode) {
                 // Program opponent (orange) starts from right side, grid-aligned
-                const player2X = Math.floor(3 * gridCols / 4) * GRID_SIZE;
+                const player2X = Math.floor(5 * gridCols / 6) * GRID_SIZE;
                 const player2Y = Math.floor(gridRows / 2) * GRID_SIZE;
                 
                 player2 = new ProgramPlayer(
@@ -425,7 +425,7 @@
                 );
             } else {
                 // Player 2 (orange) starts from right side, grid-aligned
-                const player2X = Math.floor(3 * gridCols / 4) * GRID_SIZE;
+                const player2X = Math.floor(5 * gridCols / 6) * GRID_SIZE;
                 const player2Y = Math.floor(gridRows / 2) * GRID_SIZE;
                 
                 player2 = new Player(
@@ -595,8 +595,8 @@
             }
         }
         
-        // Start the game - TRON STYLE v2.6
-        console.log("Lite Cycles TRON STYLE v2.6 loaded - Much slower speed, strategic gameplay, and enhanced styling!");
+        // Start the game - TRON STYLE v2.7
+        console.log("Lite Cycles TRON STYLE v2.7 loaded - Fixed collision detection, proper starting positions, and strategic gameplay!");
         init();
     </script>
 </body>
