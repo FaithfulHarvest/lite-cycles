@@ -129,10 +129,10 @@
     </div>
 
     <script>
-        // Game constants - SMOOTH, STRATEGIC VERSION
-        const GRID_SIZE = 20;
+        // Game constants - RESPONSIVE, STRATEGIC VERSION
+        let GRID_SIZE = 20; // Will be calculated based on screen size
         const FPS = 30; // Slower frame rate for strategic gameplay
-        const BIKE_SPEED = GRID_SIZE; // Note: Actual movement is 1.0x GRID_SIZE in move() function
+        let BIKE_SPEED = GRID_SIZE; // Will be calculated based on screen size
         
         // Colors - TRON STYLE
         const BLACK = '#000000';
@@ -162,7 +162,13 @@
             
             // Set canvas size to fit screen
             resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                // Reset game if playing to use new grid size
+                if (gameState === PLAYING) {
+                    resetGame();
+                }
+            });
             
             // Event listeners
             document.addEventListener('keydown', handleKeyDown);
@@ -172,12 +178,25 @@
             gameLoop = setInterval(update, 1000 / FPS);
         }
         
-        // Resize canvas to fit screen
+        // Resize canvas to fit screen with responsive grid
         function resizeCanvas() {
             const maxWidth = window.innerWidth - 40;
             const maxHeight = window.innerHeight - 200;
             
-            // Calculate grid dimensions
+            // Calculate responsive grid size based on screen size
+            // Aim for 15-25 grid cells in each direction for good gameplay
+            const targetCols = 20; // Target number of columns
+            const targetRows = 15; // Target number of rows
+            
+            const gridSizeX = Math.floor(maxWidth / targetCols);
+            const gridSizeY = Math.floor(maxHeight / targetRows);
+            
+            // Use the smaller grid size to maintain square cells
+            GRID_SIZE = Math.min(gridSizeX, gridSizeY, 30); // Cap at 30px max
+            GRID_SIZE = Math.max(GRID_SIZE, 15); // Minimum 15px for visibility
+            BIKE_SPEED = GRID_SIZE;
+            
+            // Calculate grid dimensions with new grid size
             const gridCols = Math.floor(maxWidth / GRID_SIZE);
             const gridRows = Math.floor(maxHeight / GRID_SIZE);
             
@@ -190,6 +209,8 @@
             
             // Center canvas
             canvas.style.margin = '20px auto';
+            
+            console.log(`Responsive grid: ${GRID_SIZE}px, ${gridCols}x${gridRows} cells`);
         }
         
         // Player class
@@ -595,8 +616,8 @@
             }
         }
         
-        // Start the game - TRON STYLE v2.8
-        console.log("Lite Cycles TRON STYLE v2.8 loaded - Smooth movement, strategic gameplay, and fixed collision detection!");
+        // Start the game - TRON STYLE v2.9
+        console.log("Lite Cycles TRON STYLE v2.9 loaded - Responsive grid sizing, smooth movement, and strategic gameplay!");
         init();
     </script>
 </body>
