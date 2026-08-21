@@ -3,6 +3,19 @@ Flask==3.0.2
 python-dotenv==1.0.0
 pygame==2.5.2
 
+# 3D Graphics and Rendering
+PyOpenGL==3.1.7
+PyOpenGL-accelerate==3.1.7
+ModernGL==5.8.2
+moderngl-window==2.4.4
+glfw==2.6.4
+numpy==1.24.3
+Pillow==10.1.0
+
+# 3D Math and Physics
+glm==0.0.1
+pyrr==0.10.3
+
 # Development dependencies
 pytest==7.4.3
 black==23.11.0
